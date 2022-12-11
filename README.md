@@ -1,10 +1,6 @@
 # Tootbot
 
-This is a Python bot that looks up posts from specified subreddits and automatically posts them on Twitter and/or [Mastodon](https://joinmastodon.org/). It is based on [reddit-twitter-bot](https://github.com/rhiever/reddit-twitter-bot). Tootbot is now used by [a wide variety of social media accounts](https://github.com/corbindavenport/tootbot/wiki/Accounts-using-Tootbot).
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-**NEW:** Subscribe to the Tootbot updates feed [via email](https://feedburner.google.com/fb/a/mailverify?uri=tootbot) or [with an RSS reader](http://feeds.feedburner.com/tootbot) to be notified when a new version is available.
+This is a Python bot that looks up posts from specified subreddits and automatically posts them on Twitter and/or [Mastodon](https://joinmastodon.org/). It is based on [reddit-twitter-bot](https://github.com/rhiever/reddit-twitter-bot).
 
 **Features:**
 
@@ -16,7 +12,7 @@ This is a Python bot that looks up posts from specified subreddits and automatic
 * Tootbot can monitor multiple subreddits at once
 * Tootbot is fully open-source, so you don't have to give an external service full access to your social media accounts
 
-Tootbot uses the [tweepy](https://github.com/tweepy/tweepy), [PRAW](https://praw.readthedocs.io/en/latest/), [py-gfycat](https://github.com/ankeshanand/py-gfycat), [imgurpython](https://github.com/Imgur/imgurpython), [Pillow](https://github.com/python-pillow/Pillow), and [Mastodon.py](https://github.com/halcy/Mastodon.py) libraries. The Heroku version also uses the [redis-py](https://github.com/andymccurdy/redis-py) library.
+Tootbot uses the [tweepy](https://github.com/tweepy/tweepy), [PRAW](https://praw.readthedocs.io/en/latest/), [py-gfycat](https://github.com/ankeshanand/py-gfycat), [imgurpython](https://github.com/Imgur/imgurpython), [Pillow](https://github.com/python-pillow/Pillow), and [Mastodon.py](https://github.com/halcy/Mastodon.py) libraries.
 
 ## Disclaimer
 
