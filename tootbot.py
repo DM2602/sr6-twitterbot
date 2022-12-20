@@ -231,7 +231,7 @@ MASTODON_INSTANCE_DOMAIN = config['Mastodon']['InstanceDomain']
 MASTODON_SENSITIVE_MEDIA = bool(
     distutils.util.strtobool(config['Mastodon']['SensitiveMedia']))
 # Setup and verify Reddit access
-if not os.path.exists('reddit.secret'):
+if not os.path.exists('secrets/reddit'):
     print('[WARN] API keys for Reddit not found. Please enter them below (see wiki if you need help).')
     # Whitespaces are stripped from input: https://stackoverflow.com/a/3739939
     REDDIT_AGENT = ''.join(input("[ .. ] Enter Reddit agent: ").split())
@@ -248,7 +248,7 @@ if not os.path.exists('reddit.secret'):
             'Agent': REDDIT_AGENT,
             'ClientSecret': REDDIT_CLIENT_SECRET
         }
-        with open('reddit.secret', 'w') as f:
+        with open('secrets/reddit', 'w') as f:
             reddit_config.write(f)
         f.close()
     except BaseException as e:
@@ -258,11 +258,11 @@ if not os.path.exists('reddit.secret'):
 else:
     # Read API keys from secret file
     reddit_config = configparser.ConfigParser()
-    reddit_config.read('reddit.secret')
+    reddit_config.read('secrets/reddit')
     REDDIT_AGENT = reddit_config['Reddit']['Agent']
     REDDIT_CLIENT_SECRET = reddit_config['Reddit']['ClientSecret']
 # Setup and verify Imgur access
-if not os.path.exists('imgur.secret'):
+if not os.path.exists('secrets/imgur'):
     print('[WARN] API keys for Imgur not found. Please enter them below (see wiki if you need help).')
     # Whitespaces are stripped from input: https://stackoverflow.com/a/3739939
     IMGUR_CLIENT = ''.join(input("[ .. ] Enter Imgur client ID: ").split())
@@ -278,7 +278,7 @@ if not os.path.exists('imgur.secret'):
             'ClientID': IMGUR_CLIENT,
             'ClientSecret': IMGUR_CLIENT_SECRET
         }
-        with open('imgur.secret', 'w') as f:
+        with open('secrets/imgur', 'w') as f:
             imgur_config.write(f)
         f.close()
     except BaseException as e:
@@ -288,15 +288,15 @@ if not os.path.exists('imgur.secret'):
 else:
     # Read API keys from secret file
     imgur_config = configparser.ConfigParser()
-    imgur_config.read('imgur.secret')
+    imgur_config.read('secrets/imgur')
     IMGUR_CLIENT = imgur_config['Imgur']['ClientID']
     IMGUR_CLIENT_SECRET = imgur_config['Imgur']['ClientSecret']
 # Log into Twitter if enabled in settings
 if POST_TO_TWITTER is True:
-    if os.path.exists('twitter.secret'):
+    if os.path.exists('secrets/twitter'):
         # Read API keys from secret file
         twitter_config = configparser.ConfigParser()
-        twitter_config.read('twitter.secret')
+        twitter_config.read('secrets/twitter')
         ACCESS_TOKEN = twitter_config['Twitter']['AccessToken']
         ACCESS_TOKEN_SECRET = twitter_config['Twitter']['AccessTokenSecret']
         CONSUMER_KEY = twitter_config['Twitter']['ConsumerKey']
@@ -342,7 +342,7 @@ if POST_TO_TWITTER is True:
                 'ConsumerKey': CONSUMER_KEY,
                 'ConsumerSecret': CONSUMER_SECRET
             }
-            with open('twitter.secret', 'w') as f:
+            with open('secrets/twitter', 'w') as f:
                 twitter_config.write(f)
             f.close()
         except BaseException as e:
@@ -351,7 +351,7 @@ if POST_TO_TWITTER is True:
             exit()
 # Log into Mastodon if enabled in settings
 if MASTODON_INSTANCE_DOMAIN:
-    if not os.path.exists('mastodon.secret'):
+    if not os.path.exists('secrets/mastodon'):
         # If the secret file doesn't exist, it means the setup process hasn't happened yet
         print('[WARN] API keys for Mastodon not found. Please enter them below (see wiki if you need help).')
         MASTODON_USERNAME = input(
@@ -364,21 +364,21 @@ if MASTODON_INSTANCE_DOMAIN:
                 'Tootbot',
                 website='https://github.com/corbindavenport/tootbot',
                 api_base_url='https://' + MASTODON_INSTANCE_DOMAIN,
-                to_file='mastodon.secret'
+                to_file='secrets/mastodon'
             )
             mastodon = Mastodon(
-                client_id='mastodon.secret',
+                client_id='secrets/mastodon',
                 api_base_url='https://' + MASTODON_INSTANCE_DOMAIN
             )
             mastodon.log_in(
                 MASTODON_USERNAME,
                 MASTODON_PASSWORD,
-                to_file='mastodon.secret'
+                to_file='secrets/mastodon'
             )
             # Make sure authentication is working
             masto_username = mastodon.account_verify_credentials()['username']
             print('[ OK ] Sucessfully authenticated on ' + MASTODON_INSTANCE_DOMAIN + ' as @' +
-                  masto_username + ', login information now stored in mastodon.secret file')
+                  masto_username + ', login information now stored in secrets/mastodon file')
         except BaseException as e:
             print('[EROR] Error while logging into Mastodon:', str(e))
             print('[EROR] Tootbot cannot continue, now shutting down')
@@ -386,8 +386,8 @@ if MASTODON_INSTANCE_DOMAIN:
     else:
         try:
             mastodon = Mastodon(
-                client_id='mastodon.secret',
-                access_token='mastodon.secret',
+                client_id='secrets/mastodon',
+                access_token='secrets/mastodon',
                 api_base_url='https://' + MASTODON_INSTANCE_DOMAIN
             )
             # Make sure authentication is working

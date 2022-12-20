@@ -1,6 +1,8 @@
 media/
 cache.csv
+# left in so little silly goober DMs secrets are not exposed again
 *.secret
+/secrets
 .vscode/
 __pycache__/
 *.pyc
