@@ -10,6 +10,8 @@ import requests
 import re
 import hashlib
 
+import logging
+
 # Function for opening file as string of bytes
 def file_as_bytes(file):
   with file:
@@ -26,7 +28,7 @@ def save_file(img_url, file_path):
 		image_file.close()
 		return file_path
 	else:
-		print('[EROR] File failed to download. Status code: ' + str(resp.status_code))
+		logging.error(f'File failed to download. Status code: ' + str(resp.status_code))
 		return
 
 # Function for obtaining direct image URLs from popular image hosts
@@ -36,13 +38,13 @@ def get_media(img_url, IMGUR_CLIENT, IMGUR_CLIENT_SECRET):
       config = configparser.ConfigParser()
       config.read('config.ini')
   except BaseException as e:
-      print ('[EROR] Error while reading config file:', str(e))
+      logging.exception('Error while reading config file:')
       sys.exit()
   # Make sure media folder exists
   IMAGE_DIR = config['MediaSettings']['MediaFolder']
   if not os.path.exists(IMAGE_DIR):
       os.makedirs(IMAGE_DIR)
-      print ('[ OK ] Media folder not found, created a new one')
+      logging.info('Media folder not found, created a new one')
   # Download and save the linked image
   if any(s in img_url for s in ('i.redd.it', 'i.reddituploads.com')): # Reddit-hosted images
     file_name = os.path.basename(urllib.parse.urlsplit(img_url).path)
@@ -60,14 +62,14 @@ def get_media(img_url, IMGUR_CLIENT, IMGUR_CLIENT_SECRET):
       img_url = img_url.replace('.gifv', '.gif')
     # Download the file
     file_path = IMAGE_DIR + '/' + file_name
-    print('[ OK ] Downloading file at URL ' + img_url + ' to ' + file_path + ', file type identified as ' + file_extension)
+    logging.info(f'Downloading file at URL ' + img_url + ' to ' + file_path + ', file type identified as ' + file_extension)
     img = save_file(img_url, file_path)
     return img
   elif ('imgur.com' in img_url): # Imgur
     try:
       client = ImgurClient(IMGUR_CLIENT, IMGUR_CLIENT_SECRET)
     except BaseException as e:
-      print ('[EROR] Error while authenticating with Imgur:', str(e))	
+      logging.exception('Error while authenticating with Imgur:')	
       return
     # Working demo of regex: https://regex101.com/r/G29uGl/2
     regex = r"(?:.*)imgur\.com(?:\/gallery\/|\/a\/|\/)(.*?)(?:\/.*|\.|$)"
@@ -88,7 +90,7 @@ def get_media(img_url, IMGUR_CLIENT, IMGUR_CLIENT_SECRET):
         img_url = imgur_url.replace('.gifv', '.gif')
       # Download the image
       file_path = IMAGE_DIR + '/' + id + file_extension
-      print('[ OK ] Downloading Imgur image at URL ' + imgur_url + ' to ' + file_path)
+      logging.info(f'Downloading Imgur image at URL ' + imgur_url + ' to ' + file_path)
       imgur_file = save_file(imgur_url, file_path)
       # Imgur will sometimes return a single-frame thumbnail instead of a GIF, so we need to check for this
       if (file_extension == '.gif'):
@@ -102,18 +104,18 @@ def get_media(img_url, IMGUR_CLIENT, IMGUR_CLIENT_SECRET):
           return imgur_file
         else:
           # Image is not actually a GIF, so don't post it
-          print('[EROR] Imgur has not processed a GIF version of this link, so it can not be posted')
+          logging.error(f'Imgur has not processed a GIF version of this link, so it can not be posted')
           img.close()
           # Delete the image
           try:
             os.remove(imgur_file)
           except BaseException as e:
-            print ('[EROR] Error while deleting media file:', str(e))
+            logging.exception('Error while deleting media file:')
           return
       else:
         return imgur_file
     else:
-      print('[EROR] Could not identify Imgur image/gallery ID in this URL:', img_url)
+      logging.error(f'Could not identify Imgur image/gallery ID in this URL:', img_url)
       return
   elif ('gfycat.com' in img_url): # Gfycat
     gfycat_name = os.path.basename(urllib.parse.urlsplit(img_url).path)
@@ -122,7 +124,7 @@ def get_media(img_url, IMGUR_CLIENT, IMGUR_CLIENT_SECRET):
     # Download the 2MB version because Tweepy has a 3MB upload limit for GIFs
     gfycat_url = gfycat_info['gfyItem']['max2mbGif']
     file_path = IMAGE_DIR + '/' + gfycat_name + '.gif'
-    print('[ OK ] Downloading Gfycat at URL ' + gfycat_url + ' to ' + file_path)
+    logging.info(f'Downloading Gfycat at URL ' + gfycat_url + ' to ' + file_path)
     gfycat_file = save_file(gfycat_url, file_path)
     return gfycat_file
   elif ('giphy.com' in img_url): # Giphy
@@ -135,18 +137,18 @@ def get_media(img_url, IMGUR_CLIENT, IMGUR_CLIENT_SECRET):
       # Download the 2MB version because Tweepy has a 3MB upload limit for GIFs
       giphy_url = 'https://media.giphy.com/media/' + id + '/giphy-downsized.gif'
       file_path = IMAGE_DIR + '/' + id + '-downsized.gif'
-      print('[ OK ] Downloading Giphy at URL ' + giphy_url + ' to ' + file_path)
+      logging.info(f'Downloading Giphy at URL ' + giphy_url + ' to ' + file_path)
       giphy_file = save_file(giphy_url, file_path)
       # Check the hash to make sure it's not a GIF saying "This content is not available"
       # More info: https://github.com/corbindavenport/tootbot/issues/8
       hash = hashlib.md5(file_as_bytes(open(giphy_file, 'rb'))).hexdigest()
       if (hash == '59a41d58693283c72d9da8ae0561e4e5'):
-        print('[EROR] Giphy has not processed a downsized GIF version of this link, so it can not be posted')
+        logging.error(f'Giphy has not processed a downsized GIF version of this link, so it can not be posted')
         return
       else:
         return giphy_file
     else:
-      print('[EROR] Could not identify Giphy ID in this URL:', img_url)
+      logging.error(f'Could not identify Giphy ID in this URL:', img_url)
       return
   else:
     # Check if URL is an image, based on the MIME type
@@ -157,13 +159,13 @@ def get_media(img_url, IMGUR_CLIENT, IMGUR_CLIENT_SECRET):
       # URL appears to be an image, so download it
       file_name = os.path.basename(urllib.parse.urlsplit(img_url).path)
       file_path = IMAGE_DIR + '/' + file_name
-      print('[ OK ] Downloading file at URL ' + img_url + ' to ' + file_path)
+      logging.info(f'Downloading file at URL ' + img_url + ' to ' + file_path)
       try:
         img = save_file(img_url, file_path)
         return img
       except BaseException as e:
-        print ('[EROR] Error while downloading image:', str(e))
+        logging.exception('Error while downloading image:')
         return
     else:
-      print ('[EROR] URL does not point to a valid image file.')
+      logging.info('URL does not point to a valid image file.')
       return
