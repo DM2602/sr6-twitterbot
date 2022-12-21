@@ -14,7 +14,10 @@ from getmedia import get_media
 # TODO: rolling file
 import logging
 
-logging.basicConfig(filename="data/log.log", level=logging.DEBUG)
+logging.basicConfig(
+    filename="data/log.log",
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.DEBUG)
 
 
 def tweet_creator(subreddit_info):
