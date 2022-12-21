@@ -11,5 +11,6 @@ services:
     stop_grace_period: 30s
 
     volumes:
+      - ./media:/usr/src/app/media
       - ./data:/usr/src/app/data
       - ./secrets:/usr/src/app/secrets

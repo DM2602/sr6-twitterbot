@@ -1,8 +1,10 @@
+# runtime data
 media/
-cache.csv
+data/
+secrets/
+
 # left in so little silly goober DMs secrets are not exposed again
 *.secret
-/secrets
 .vscode/
 __pycache__/
 *.pyc
