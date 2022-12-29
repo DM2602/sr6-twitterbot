@@ -187,7 +187,7 @@ def make_post(post_dict):
                     except BaseException:
                         logging.exception('Error while deleting media file:')
                 # Go to sleep
-                logging.info('Sleeping for', DELAY_BETWEEN_TWEETS, 'seconds')
+                logging.info(f'Sleeping for {DELAY_BETWEEN_TWEETS}, seconds')
                 time.sleep(DELAY_BETWEEN_TWEETS)
             else:
                 logging.info(
